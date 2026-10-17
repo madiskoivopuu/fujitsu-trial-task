@@ -1,6 +1,7 @@
 package ee.fujitsu.fooddelivery.client;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -44,14 +45,14 @@ public class WeatherDataClient {
             .build();
 
         try {
-            HttpResponse<java.io.InputStream> response = client.send(request,
+            HttpResponse<InputStream> response = client.send(request,
                 HttpResponse.BodyHandlers.ofInputStream());
 
             if (response.statusCode() != 200) {
-                throw new IllegalStateException("Weather API returned HTTP " + response.statusCode());
+                throw new WeatherClientException("Weather API returned HTTP " + response.statusCode());
             }
 
-            try (var body = response.body()) {
+            try (InputStream body = response.body()) {
                 weatherData = responseParser.parseObservations(body);
             }
         } catch (InterruptedException e) {
