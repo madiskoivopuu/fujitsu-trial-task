@@ -48,11 +48,11 @@ public class WeatherDataClient {
             HttpResponse<InputStream> response = client.send(request,
                 HttpResponse.BodyHandlers.ofInputStream());
 
-            if (response.statusCode() != 200) {
-                throw new WeatherClientException("Weather API returned HTTP " + response.statusCode());
-            }
-
             try (InputStream body = response.body()) {
+                if (response.statusCode() != 200) {
+                    throw new WeatherClientException("Weather API returned HTTP " + response.statusCode());
+                }
+
                 weatherData = responseParser.parseObservations(body);
             }
         } catch (InterruptedException e) {
