@@ -1,4 +1,5 @@
 package ee.fujitsu.fooddelivery.client;
+import ee.fujitsu.fooddelivery.dto.WeatherDataDto;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,13 +16,11 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import ee.fujitsu.fooddelivery.dto.WeatherDataDto;
+import lombok.AllArgsConstructor;
 
 @Component
+@AllArgsConstructor  
 public class WeatherResponseParser {
-
-    public WeatherResponseParser() {}
-
     /**
      * Parses weather observations from the Estonian Environment Agency's XML response (API: https://www.ilmateenistus.ee/ilma_andmed/xml/observations.php). 
      * @param dataStream Input stream from the response which contains XML

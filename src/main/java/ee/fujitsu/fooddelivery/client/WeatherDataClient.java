@@ -17,21 +17,15 @@ import org.xml.sax.SAXException;
 
 import ee.fujitsu.fooddelivery.dto.WeatherDataDto;
 import ee.fujitsu.fooddelivery.exceptions.WeatherClientException;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor  
 public class WeatherDataClient {
-
+    @Value("${weather-api.url}")
     private final URI weatherApiUrl;
     private final HttpClient client;
     private final WeatherResponseParser responseParser;
-
-    public WeatherDataClient(@Value("${weather-api.url}") URI weatherApiUrl, HttpClient client,
-            WeatherResponseParser responseParser) {
-        this.weatherApiUrl = weatherApiUrl;
-        this.client = client;
-        this.responseParser = responseParser;
-    }
-
     /**
      * Fetches the weather data at current timestamp for all weather stations from Estonian Environment Agency's API.
      * @return List of weather observations from each weather station. 
