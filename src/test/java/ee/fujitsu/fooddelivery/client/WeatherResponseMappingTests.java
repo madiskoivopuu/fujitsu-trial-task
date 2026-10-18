@@ -1,34 +1,30 @@
 package ee.fujitsu.fooddelivery.client;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.xml.sax.SAXException;
 
-import ee.fujitsu.fooddelivery.dto.WeatherDataDto;
+import ee.fujitsu.fooddelivery.configuration.BeansConfig;
+import tools.jackson.core.JacksonException;
+import tools.jackson.dataformat.xml.XmlMapper;
 
-@ExtendWith(MockitoExtension.class)
-class WeatherResponseParserTests {
-    private WeatherResponseParser responseParser;
+class WeatherResponseMappingTests {
+    private XmlMapper xmlMapper;
 
     @BeforeEach
     void setupTests() {
-        responseParser = new WeatherResponseParser();
+        xmlMapper = new BeansConfig().xmlMapper();
+
     }
 
     @Test
-    void parsingShouldReturnCorrectData() throws IOException, ParserConfigurationException, SAXException {
+    void shouldMapToCorrectFieldsWhenXmlIsParsed() throws JacksonException {
         String inputXml = """
         <observations timestamp="1792244247">
             <station>
@@ -75,37 +71,17 @@ class WeatherResponseParserTests {
             </station>
         </observations>
         """;
-        InputStream stream = new ByteArrayInputStream(inputXml.getBytes());
-        List<WeatherDataDto> expectedObservations = List.of(
-            new WeatherDataDto("Kuressaare linn", null, 10.8, null, null, 1792244247),
-            new WeatherDataDto("Tallinn-Harku", 26038, 9.7, 1.9, "Light shower", 1792244247)
+        InputStream stream = new ByteArrayInputStream(inputXml.getBytes(StandardCharsets.UTF_8));
+        Observations expectedObservations = new Observations(
+            1792244247,
+            List.of(
+                new Station("Kuressaare linn", null, 10.8, null, null),
+                new Station("Tallinn-Harku", 26038, 9.7, 1.9, "Light shower")
+            )
         );
 
-        List<WeatherDataDto> observations = responseParser.parseObservations(stream);
+        Observations observations = xmlMapper.readValue(stream, Observations.class);
 
-        assertTrue(observations.equals(expectedObservations));
-    }
-
-    @Test
-    void parsingMalformedXmlShouldThrowException() throws IOException, ParserConfigurationException, SAXException {
-        String inputXml = """
-        <observations timestamp="1792244247">
-            <station>
-                <name>Kuressaare linn</name>
-                <wmocode/>
-                <longitude>22.48944444411111</longitude>
-                <latitude>58.26416666666667</latitude>
-                <phenomenon/>
-                <visibility/>
-                <precipitations/>
-                <airpressure/>
-                <relativehumidity>87</relativehumidity>
-                <airtemper
-        """;
-        InputStream stream = new ByteArrayInputStream(inputXml.getBytes());
-
-        assertThrows(
-            SAXException.class, 
-            () -> responseParser.parseObservations(stream));
+        assertEquals(expectedObservations, observations);
     }
 }
