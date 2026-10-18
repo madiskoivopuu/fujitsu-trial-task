@@ -21,6 +21,7 @@ public class ExtraFees {
     private Long id;
 
     private Instant validFrom;
+    private Instant validTo;
     private BigDecimal feeForTempLessThanMinusTenDegrees;
     private BigDecimal feeForTempBetweenMinusTenAndZeroDegrees;
     private BigDecimal feeForWindSpeedBetween10And20Mps;

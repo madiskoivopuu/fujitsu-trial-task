@@ -48,7 +48,7 @@ public class DeliveryFeeService {
     public BigDecimal loadFeesAndPerformCalculation(City city, VehicleType vehicleType, Instant targetTime) throws VehicleUsageDisallowedException, WeatherDataNotFoundException, FeeNotFoundException {
         RegionalBaseFee regionalBaseFee = baseFeeRepository.findLatestBaseFeeAtOrBeforeTimestamp(city, vehicleType, targetTime)
             .orElseThrow(() -> new FeeNotFoundException("Regional base fee could not be found"));
-        ExtraFees extraFees = extraFeeRepository.findLatestExtraFeesAtOrBeforeTimestamp(city, targetTime)
+        ExtraFees extraFees = extraFeeRepository.findLatestExtraFeesAtOrBeforeTimestamp(targetTime)
             .orElseThrow(() -> new FeeNotFoundException("Extra fees could not be found"));
         WeatherDataModel weatherData = weatherDataRepository.findLatestWeatherDataByCityAtOrBefore(city, targetTime)
             .orElseThrow(() -> new WeatherDataNotFoundException("Weather data at current timestamp could not be found"));

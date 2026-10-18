@@ -31,5 +31,6 @@ public class RegionalBaseFee {
     @Enumerated(EnumType.STRING)
     private VehicleType vehicleType;
     private Instant validFrom;
+    private Instant validTo;
     private BigDecimal fee;
 }

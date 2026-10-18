@@ -14,11 +14,8 @@ import ee.fujitsu.fooddelivery.core.ExtraFees;
 @Repository
 public interface ExtraFeeRepository extends JpaRepository<ExtraFees, Long> {
     /**
-     * Returns the extra fees effective at the specified timestamp for the
-     * given city
+     * Returns the extra fees that were effective at the specified timestamp
      *
-     * @param city delivery city
-     * @param vehicleType type of vehicle used for the delivery
      * @param targetTimestamp instant at which the fee must be valid
      * @return the fee with the latest validity start at or before the target timestamp,
      *         or an empty Optional if no matching fee exists
@@ -26,11 +23,11 @@ public interface ExtraFeeRepository extends JpaRepository<ExtraFees, Long> {
     @Query("""
         SELECT extrafees FROM ExtraFees extrafees
         WHERE extrafees.validFrom <= :targetTimestamp
+          AND (extrafees.validTo IS NULL OR :targetTimestamp < extrafees.validTo)
         ORDER BY extrafees.validFrom DESC
         LIMIT 1
         """)
     Optional<ExtraFees> findLatestExtraFeesAtOrBeforeTimestamp(
-        @Param("city") City city,
         @Param("targetTimestamp") Instant targetTimestamp
     );
 }
