@@ -23,9 +23,4 @@ public class BeansConfig {
             .enable(XmlReadFeature.EMPTY_ELEMENT_AS_NULL)
             .build();
     }
-
-    @Bean 
-    public DeliveryFeeCalculator deliveryFeeCalculator() {
-        return new DeliveryFeeCalculator();
-    }
 }

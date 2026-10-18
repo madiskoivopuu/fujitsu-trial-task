@@ -20,9 +20,6 @@ import lombok.NoArgsConstructor;
 @Data 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(
-    columnNames = {"city", "vehicleType", "validFrom"}
-))
 public class RegionalBaseFee {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
