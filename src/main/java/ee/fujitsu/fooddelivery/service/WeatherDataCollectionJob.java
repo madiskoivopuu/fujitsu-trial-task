@@ -17,6 +17,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2 
 @RequiredArgsConstructor 
 public class WeatherDataCollectionJob {
+    // TODO: replace with city.values()
     private static final Set<String> SUPPORTED_STATIONS = Set.of(
         "Tallinn-Harku",
         "Tartu-Tõravere",
@@ -49,7 +50,7 @@ public class WeatherDataCollectionJob {
             .map(station -> mapper.toWeatherDataModel(station, weatherData.observationUnixTimestamp()))
             .toList()
         );
-
+        
         log.info("Weather data collection job ended successfully");
     }
 }

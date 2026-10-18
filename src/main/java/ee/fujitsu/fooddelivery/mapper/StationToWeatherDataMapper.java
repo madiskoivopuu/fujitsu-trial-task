@@ -1,20 +1,22 @@
 package ee.fujitsu.fooddelivery.mapper;
 
-import org.springframework.stereotype.Component;
+import java.time.Instant;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import ee.fujitsu.fooddelivery.client.Station;
 import ee.fujitsu.fooddelivery.entity.WeatherDataModel;
 
-@Component 
-public class StationToWeatherDataMapper {
-    public WeatherDataModel toWeatherDataModel(Station station, Integer observationTimestamp) {
-        return new WeatherDataModel(
-            station.stationName(),
-            station.wmoCode(),
-            station.airTemperatureCelsius(),
-            station.windSpeedMetersPerSecond(),
-            station.weatherPhenomenon(),
-            observationTimestamp
-        );
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
+public interface StationToWeatherDataMapper {
+    default Instant toInstant(Integer epochSeconds) {
+        return epochSeconds == null
+            ? null
+            : Instant.ofEpochSecond(epochSeconds);
     }
+
+    @Mapping(ignore = true, target = "id")
+    public WeatherDataModel toWeatherDataModel(Station station, Integer observationTimestamp);
 }
