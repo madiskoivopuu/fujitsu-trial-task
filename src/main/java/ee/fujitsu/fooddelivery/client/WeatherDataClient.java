@@ -6,18 +6,14 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.xml.sax.SAXException;
 
-import ee.fujitsu.fooddelivery.dto.WeatherDataDto;
 import ee.fujitsu.fooddelivery.exceptions.WeatherClientException;
 import lombok.RequiredArgsConstructor;
+import tools.jackson.core.JacksonException;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 @Component
 @RequiredArgsConstructor  
@@ -25,15 +21,15 @@ public class WeatherDataClient {
     @Value("${weather-api.url}")
     private final URI weatherApiUrl;
     private final HttpClient client;
-    private final WeatherResponseParser responseParser;
+    private final XmlMapper mapper;
+
     /**
-     * Fetches the weather data at current timestamp for all weather stations from Estonian Environment Agency's API.
-     * @return List of weather observations from each weather station. 
-     *      Individual observation fields may be null when some data from a weather station is unavailable
-     * @throws WeatherClientException If the response cannot be fetched or parsed
+     * Fetches the latest available weather data for all weather stations from Estonian Environment Agency's API
+     * @return An observations object which contains the unix timestamp and a list of observations for all weather stations
+     * @throws WeatherClientException If the request fails, the API returns a non-200 status code or the response cannot be parsed
      */
-    public List<WeatherDataDto> getCurrentWeatherObservations() throws WeatherClientException {
-        List<WeatherDataDto> weatherData = new ArrayList<>();
+    public Observations getCurrentWeatherObservations() throws WeatherClientException {
+        Observations weatherData;
         HttpRequest request = HttpRequest.newBuilder()
             .uri(weatherApiUrl)
             .build();
@@ -47,15 +43,15 @@ public class WeatherDataClient {
                     throw new WeatherClientException("Weather API returned HTTP " + response.statusCode());
                 }
 
-                weatherData = responseParser.parseObservations(body);
+                weatherData = mapper.readValue(body, Observations.class);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new WeatherClientException("Weather API request was interrupted", e);
-        } catch (IOException | ParserConfigurationException | SAXException e) {
+        } catch (IOException e) {
             throw new WeatherClientException("Failed to retrieve weather observations", e);
-        } catch(NumberFormatException e) {
-            throw new WeatherClientException("Failed to parse numeric value in weather response", e);
+        } catch(JacksonException e) {
+            throw new WeatherClientException("Failed to parse XML from API response", e);
         }
 
         return weatherData;

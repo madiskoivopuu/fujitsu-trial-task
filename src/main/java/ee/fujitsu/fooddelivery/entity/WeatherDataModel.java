@@ -1,6 +1,5 @@
 package ee.fujitsu.fooddelivery.entity;
 
-import ee.fujitsu.fooddelivery.dto.WeatherDataDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,14 +30,4 @@ public class WeatherDataModel {
         this.observationTimestamp = observationTimestamp;
     }
 
-    public static WeatherDataModel from(WeatherDataDto dto) {
-        return new WeatherDataModel(
-            dto.stationName(),
-            dto.wmoCode(),
-            dto.airTemperatureCelsius(),
-            dto.windSpeedMetersPerSecond(),
-            dto.weatherPhenomenon(),
-            dto.observationTimestamp()
-        );
-    }
 }

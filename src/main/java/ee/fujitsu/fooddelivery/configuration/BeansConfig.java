@@ -5,7 +5,8 @@ import java.net.http.HttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import ee.fujitsu.fooddelivery.client.WeatherResponseParser;
+import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.dataformat.xml.XmlReadFeature;
 
 @Configuration 
 public class BeansConfig {
@@ -15,8 +16,10 @@ public class BeansConfig {
         return HttpClient.newHttpClient();
     }
 
-    @Bean 
-    public WeatherResponseParser weatherResponseParser() {
-        return new WeatherResponseParser();
+    @Bean
+    public XmlMapper xmlMapper() {
+        return XmlMapper.builder()
+            .enable(XmlReadFeature.EMPTY_ELEMENT_AS_NULL)
+            .build();
     }
 }
