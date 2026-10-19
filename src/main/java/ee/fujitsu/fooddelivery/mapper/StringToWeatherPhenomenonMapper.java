@@ -1,15 +1,24 @@
 package ee.fujitsu.fooddelivery.mapper;
 
-import ee.fujitsu.fooddelivery.core.WeatherConditions;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 import ee.fujitsu.fooddelivery.core.WeatherPhenomenon;
 import ee.fujitsu.fooddelivery.entity.WeatherDataModel;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
-public interface WeatherDataToPhenomenonMapper {
-    default WeatherPhenomenon mapWeatherPhenomenon(String value) {
+
+@Component
+public class StringToWeatherPhenomenonMapper {
+    /**
+     * Maps the weather phenomenon from Estonian Environment Agency's observations API to
+     * our own WeatherPhenomenon enum
+     *
+     * @param value weather phenomenon from the agency's observations API
+     *
+     * @return WeatherPhenomenon enum
+     */
+    public WeatherPhenomenon toWeatherPhenomenon(String value) {
         if (value == null) {
             return WeatherPhenomenon.UNKNOWN;
         }
@@ -36,9 +45,7 @@ public interface WeatherDataToPhenomenonMapper {
                 WeatherPhenomenon.HAIL;
 
             default -> 
-                WeatherPhenomenon.UNKNOWN;
+                WeatherPhenomenon.REGULAR;
         };
     }
-
-    public WeatherConditions toWeatherPhenomenon(WeatherDataModel model);
 }

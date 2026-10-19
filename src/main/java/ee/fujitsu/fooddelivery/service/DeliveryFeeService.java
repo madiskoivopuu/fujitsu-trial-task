@@ -13,7 +13,7 @@ import ee.fujitsu.fooddelivery.entity.WeatherDataModel;
 import ee.fujitsu.fooddelivery.exceptions.FeeNotFoundException;
 import ee.fujitsu.fooddelivery.exceptions.VehicleUsageDisallowedException;
 import ee.fujitsu.fooddelivery.exceptions.WeatherDataNotFoundException;
-import ee.fujitsu.fooddelivery.mapper.WeatherDataToPhenomenonMapper;
+import ee.fujitsu.fooddelivery.mapper.StringToWeatherPhenomenonMapper;
 import ee.fujitsu.fooddelivery.repository.BaseFeeRepository;
 import ee.fujitsu.fooddelivery.repository.WeatherDataRepository;
 import ee.fujitsu.fooddelivery.repository.ExtraFeeRepository;
@@ -27,7 +27,7 @@ public class DeliveryFeeService {
     private final BaseFeeRepository baseFeeRepository;
     private final ExtraFeeRepository extraFeeRepository;
     private final WeatherDataRepository weatherDataRepository;
-    private final WeatherDataToPhenomenonMapper weatherDataMapper;
+    private final StringToWeatherPhenomenonMapper weatherDataMapper;
 
     private final DeliveryFeeCalculator calculator;
 
@@ -54,14 +54,11 @@ public class DeliveryFeeService {
         WeatherDataModel weatherData = weatherDataRepository.findLatestWeatherDataByCityAtOrBefore(city, targetTime)
             .orElseThrow(() -> new WeatherDataNotFoundException("Weather data at current timestamp could not be found"));
 
-        WeatherConditions weather =
-                weatherDataMapper.toWeatherPhenomenon(weatherData);
-
         FeeEvaluationContext context = new FeeEvaluationContext(
                 vehicleType,
                 weatherData.getAirTemperatureCelsius(),
                 weatherData.getWindSpeedMetersPerSecond(),
-                weather.weatherPhenomenon()
+                weatherDataMapper.toWeatherPhenomenon(weatherData.getWeatherPhenomenon())
         );
 
         return calculator.calculateFee(context, regionalBaseFee, extraFees);
