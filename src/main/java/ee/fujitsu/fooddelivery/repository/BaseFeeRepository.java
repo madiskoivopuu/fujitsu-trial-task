@@ -31,9 +31,8 @@ public interface BaseFeeRepository extends JpaRepository<RegionalBaseFee, Long> 
           AND basefee.validFrom <= :targetTimestamp
           AND (basefee.validTo IS NULL OR :targetTimestamp < basefee.validTo)
         ORDER BY basefee.validFrom DESC
-        LIMIT 1
         """)
-    Optional<RegionalBaseFee> findLatestBaseFeeAtOrBeforeTimestamp(
+    Optional<RegionalBaseFee> findActiveBaseFee(
         @Param("city") City city,
         @Param("vehicleType") VehicleType vehicleType,
         @Param("targetTimestamp") Instant targetTimestamp

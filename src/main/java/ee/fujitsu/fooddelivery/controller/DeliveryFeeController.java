@@ -3,6 +3,7 @@ package ee.fujitsu.fooddelivery.controller;
 import java.math.BigDecimal;
 import java.time.Instant;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @RestController
-@RequestMapping("/api/delivery-fee")
+@RequestMapping(path = "/api/delivery-fee", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Log4j2 
 public class DeliveryFeeController {

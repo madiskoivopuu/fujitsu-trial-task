@@ -1,14 +1,14 @@
 package ee.fujitsu.fooddelivery.mapper;
 
+import ee.fujitsu.fooddelivery.core.WeatherConditions;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
-import ee.fujitsu.fooddelivery.core.WeatherConditions;
 import ee.fujitsu.fooddelivery.core.WeatherPhenomenon;
 import ee.fujitsu.fooddelivery.entity.WeatherDataModel;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
-public interface WeatherDataToWeatherConditionsMapper {
+public interface WeatherDataToPhenomenonMapper {
     default WeatherPhenomenon mapWeatherPhenomenon(String value) {
         if (value == null) {
             return WeatherPhenomenon.UNKNOWN;

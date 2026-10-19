@@ -4,18 +4,16 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
+import ee.fujitsu.fooddelivery.core.*;
+import ee.fujitsu.fooddelivery.core.fees.ExtraFeeRule;
+import ee.fujitsu.fooddelivery.core.FeeEvaluationContext;
 import org.springframework.stereotype.Service;
 
-import ee.fujitsu.fooddelivery.core.City;
-import ee.fujitsu.fooddelivery.core.DeliveryFeeCalculator;
-import ee.fujitsu.fooddelivery.core.ExtraFees;
-import ee.fujitsu.fooddelivery.core.RegionalBaseFee;
-import ee.fujitsu.fooddelivery.core.VehicleType;
 import ee.fujitsu.fooddelivery.entity.WeatherDataModel;
 import ee.fujitsu.fooddelivery.exceptions.FeeNotFoundException;
 import ee.fujitsu.fooddelivery.exceptions.VehicleUsageDisallowedException;
 import ee.fujitsu.fooddelivery.exceptions.WeatherDataNotFoundException;
-import ee.fujitsu.fooddelivery.mapper.WeatherDataToWeatherConditionsMapper;
+import ee.fujitsu.fooddelivery.mapper.WeatherDataToPhenomenonMapper;
 import ee.fujitsu.fooddelivery.repository.BaseFeeRepository;
 import ee.fujitsu.fooddelivery.repository.WeatherDataRepository;
 import ee.fujitsu.fooddelivery.repository.ExtraFeeRepository;
@@ -29,7 +27,7 @@ public class DeliveryFeeService {
     private final BaseFeeRepository baseFeeRepository;
     private final ExtraFeeRepository extraFeeRepository;
     private final WeatherDataRepository weatherDataRepository;
-    private final WeatherDataToWeatherConditionsMapper weatherDataMapper;
+    private final WeatherDataToPhenomenonMapper weatherDataMapper;
 
     private final DeliveryFeeCalculator calculator;
 
@@ -49,13 +47,23 @@ public class DeliveryFeeService {
         if(targetTime == null)
             targetTime = Instant.now();
 
-        RegionalBaseFee regionalBaseFee = baseFeeRepository.findLatestBaseFeeAtOrBeforeTimestamp(city, vehicleType, targetTime)
+        RegionalBaseFee regionalBaseFee = baseFeeRepository.findActiveBaseFee(city, vehicleType, targetTime)
             .orElseThrow(() -> new FeeNotFoundException("Regional base fee could not be found"));
-        ExtraFees extraFees = extraFeeRepository.findLatestExtraFeesAtOrBeforeTimestamp(targetTime)
+        List<ExtraFeeRule> extraFees = extraFeeRepository.findApplicableExtraFees(city, vehicleType, targetTime)
             .orElseThrow(() -> new FeeNotFoundException("Extra fees could not be found"));
         WeatherDataModel weatherData = weatherDataRepository.findLatestWeatherDataByCityAtOrBefore(city, targetTime)
             .orElseThrow(() -> new WeatherDataNotFoundException("Weather data at current timestamp could not be found"));
 
-        return calculator.calculateFee(vehicleType, weatherDataMapper.toWeatherPhenomenon(weatherData), regionalBaseFee, extraFees);
+        WeatherConditions weather =
+                weatherDataMapper.toWeatherPhenomenon(weatherData);
+
+        FeeEvaluationContext context = new FeeEvaluationContext(
+                vehicleType,
+                weatherData.getAirTemperatureCelsius(),
+                weatherData.getWindSpeedMetersPerSecond(),
+                weather.weatherPhenomenon()
+        );
+
+        return calculator.calculateFee(context, regionalBaseFee, extraFees);
     }
 }
