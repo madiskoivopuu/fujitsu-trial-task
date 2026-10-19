@@ -3,11 +3,13 @@ package ee.fujitsu.fooddelivery.service;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -32,7 +34,7 @@ public class WeatherDataCollectionJobTests {
     @BeforeEach
     void setupTests() {
         weatherDataCollectionJob = new WeatherDataCollectionJob(
-            weatherDataClient, repository, new StationToWeatherDataMapper()
+            weatherDataClient, repository, Mappers.getMapper(StationToWeatherDataMapper.class)
         );
     }
 
@@ -53,9 +55,9 @@ public class WeatherDataCollectionJobTests {
         weatherDataCollectionJob.collectWeatherData();
 
         List<WeatherDataModel> expectedWeatherData = List.of(
-            new WeatherDataModel("Tallinn-Harku", 26038, 10.8, 3.2, "Light rain", 1792257127),
-            new WeatherDataModel("Tartu-Tõravere", 26242, 10.0, 1.4, "Clear", 1792257127),
-            new WeatherDataModel("Pärnu", 41803, 10.7, 7.2, "Overcast", 1792257127)
+            new WeatherDataModel("Tallinn-Harku", 26038, 10.8, 3.2, "Light rain", Instant.ofEpochSecond(1792257127)),
+            new WeatherDataModel("Tartu-Tõravere", 26242, 10.0, 1.4, "Clear", Instant.ofEpochSecond(1792257127)),
+            new WeatherDataModel("Pärnu", 41803, 10.7, 7.2, "Overcast", Instant.ofEpochSecond(1792257127))
         );
         verify(repository).saveAll(expectedWeatherData);
     }
@@ -77,8 +79,8 @@ public class WeatherDataCollectionJobTests {
         weatherDataCollectionJob.collectWeatherData();
 
         List<WeatherDataModel> expectedWeatherData = List.of(
-            new WeatherDataModel("Tallinn-Harku", 26038, 10.8, 3.2, "Light rain", 1792257127),
-            new WeatherDataModel("Tartu-Tõravere", 26242, 10.0, 1.4, "Clear", 1792257127)
+            new WeatherDataModel("Tallinn-Harku", 26038, 10.8, 3.2, "Light rain", Instant.ofEpochSecond(1792257127)),
+            new WeatherDataModel("Tartu-Tõravere", 26242, 10.0, 1.4, "Clear", Instant.ofEpochSecond(1792257127))
         );
         verify(repository).saveAll(expectedWeatherData);
     }
