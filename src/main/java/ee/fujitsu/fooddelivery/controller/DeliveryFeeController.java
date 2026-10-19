@@ -42,9 +42,6 @@ public class DeliveryFeeController {
         @RequestParam("city") City city,
         @RequestParam("vehicleType") VehicleType vehicleType,
         @RequestParam(value = "targetTime", required = false) Instant targetTime) {
-        if(targetTime == null)
-            targetTime = Instant.now();
-
         try {
             return ResponseEntity.ok(
                 new DeliveryFeeResponse(deliveryFeeService.loadFeesAndPerformCalculation(city, vehicleType, targetTime))

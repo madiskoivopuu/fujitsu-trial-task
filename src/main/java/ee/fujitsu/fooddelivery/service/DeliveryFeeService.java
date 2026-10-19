@@ -46,6 +46,9 @@ public class DeliveryFeeService {
      * @throws FeeNotFoundException when regional base fees or extra fees are missing at a given target time
      */
     public BigDecimal loadFeesAndPerformCalculation(City city, VehicleType vehicleType, Instant targetTime) throws VehicleUsageDisallowedException, WeatherDataNotFoundException, FeeNotFoundException {
+        if(targetTime == null)
+            targetTime = Instant.now();
+
         RegionalBaseFee regionalBaseFee = baseFeeRepository.findLatestBaseFeeAtOrBeforeTimestamp(city, vehicleType, targetTime)
             .orElseThrow(() -> new FeeNotFoundException("Regional base fee could not be found"));
         ExtraFees extraFees = extraFeeRepository.findLatestExtraFeesAtOrBeforeTimestamp(targetTime)
