@@ -149,7 +149,7 @@ class DeliveryFeeCalculatorIntegrationTests {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldRejectForbiddenWeatherPhenomenonRegardlessOfRuleOrder(boolean forbiddenRuleFirst) {
-        FeeEvaluationContext context = new FeeEvaluationContext(VehicleType.BIKE, -5.0, 25.0, WeatherPhenomenon.REGULAR);
+        FeeEvaluationContext context = new FeeEvaluationContext(VehicleType.BIKE, -5.0, 25.0, WeatherPhenomenon.GLAZE);
         AirTemperatureFee temperature = temperatureFee(VehicleType.BIKE, -10.0, 0.0, "0.50");
         WindSpeedFee windSpeedFee = windFee(VehicleType.BIKE, 20.0, Double.MAX_VALUE, "0.00");
         WeatherPhenomenonFee forbidden = phenomenonFee(VehicleType.BIKE, WeatherPhenomenon.GLAZE, "0.00");
